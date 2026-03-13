@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: negative-test-compliance
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: heavy-app } }
+  template:
+    metadata: { labels: { app: heavy-app } }
+    spec:
+      containers:
+      - name: miner
+        image: nginx:alpine
+        resources:
+          limits:
+            cpu: "10" # Violation! Business policy is 500m
+            memory: "16Gi" # Violation! You only have 8GB total!

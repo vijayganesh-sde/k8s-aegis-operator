@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-engine
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-engine
+  template:
+    metadata:
+      labels:
+        app: k8s-engine
+    spec:
+      serviceAccountName: k8s-engine-sa
+      containers:
+        - name: engine
+          image: k8s-engine-image:v1
+          imagePullPolicy: Never
+          resources:
+            requests:
+              memory: "64Mi"   # Minimum it needs to start
+              cpu: "50m"
+            limits:
+              memory: "256Mi"  # High enough to handle the watch-stream
+              cpu: "200m"
+          env:
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-secrets
+                  key: token
+            - name: SLACK_CHANNEL
+              valueFrom:
+                secretKeyRef:
+                  name: slack-secrets
+                  key: channel

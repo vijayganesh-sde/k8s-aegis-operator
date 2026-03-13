@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: k8s-engine-sa
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: k8s-engine-role
+rules:
+  # 1. Main Business Resources (PVCs, Pods, Deployments)
+  - apiGroups: ["", "apps"]
+    resources: ["persistentvolumeclaims", "pods", "deployments", "namespaces", "deployments/status"]
+    verbs: ["get", "list", "watch", "patch", "update"]
+
+  # 2. Security Resources (Secrets - Fixes your 403 error)
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch", "patch", "update"]
+
+  # 3. Observability (Events - Fixes the warning for posting events)
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+
+  # 4. Kopf Internal Discovery (Required for operator health)
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: ["customresourcedefinitions"]
+    verbs: ["list", "watch"]
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources: ["validatingwebhookconfigurations", "mutatingwebhookconfigurations"]
+    verbs: ["list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: k8s-engine-binding
+subjects:
+  - kind: ServiceAccount
+    name: k8s-engine-sa
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: k8s-engine-role
+  apiGroup: rbac.authorization.k8s.io

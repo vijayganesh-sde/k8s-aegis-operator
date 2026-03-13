@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smoke-test-compliance
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smoke-test
+  template:
+    metadata:
+      labels:
+        app: smoke-test
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:alpine
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "10m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"

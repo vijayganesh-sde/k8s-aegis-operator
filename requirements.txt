@@ -1,0 +1,11 @@
+# Kubernetes Python Client: To interact with the K8s API
+kubernetes==29.0.0
+
+# Kopf (Kubernetes Operator Framework): To build the controller logic
+kopf==1.36.2
+
+# Slack SDK: To send alerts to your Slack channel
+slack-sdk==3.27.1
+
+# Optional: PyYAML for parsing any local config files
+PyYAML==6.0.1
