@@ -37,6 +37,7 @@ sleep 5
 
 echo "--- DEPLOY SMOKE TEST NEGATIVE RESOURCES ---"
 kubectl apply -f smoke-tests/negative-scenarios/
+kubectl scale deployment drift-test --replicas=3
 sleep 30
 kubectl delete -f smoke-tests/negative-scenarios/ --grace-period=0 --force
 

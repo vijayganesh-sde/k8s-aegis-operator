@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drift-test
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: '{"spec":{"replicas":3}}'
+spec:
+  replicas: 1 
+  selector: { matchLabels: { app: drift } }
+  template:
+    metadata: { labels: { app: drift } }
+    spec:
+      containers: 
+      - name: nginx
+        image: nginx:alpine
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi" # Now Compliance won't trigger!

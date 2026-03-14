@@ -3,11 +3,15 @@ import logging
 from modules.efficiency import EfficiencyModule
 from modules.security import SecurityModule
 from modules.compliance import ComplianceModule
+from modules.drift import DriftModule
+from modules.resilience import ResilienceModule
 
 # Initialize Modules
 efficiency = EfficiencyModule()
 security = SecurityModule()
 compliance = ComplianceModule()
+drift = DriftModule()
+resilience = ResilienceModule()
 
 @kopf.on.startup()
 def configure(settings: kopf.OperatorSettings, **_):
@@ -35,3 +39,13 @@ def enforce_compliance(name, namespace, spec, patch, **_):
   if namespace in ["kube-system", "kube-public", "kube-node-lease"]:
     return
   compliance.enforce_resource_limits(name, spec, patch)
+  
+# --- Drift Detection Handlers ---
+@kopf.on.update('deployments')
+def detect_drift(name, namespace, body, patch, **_):
+  drift.check_drift(name, namespace, body, patch)
+
+# --- Resilience Handlers ---
+@kopf.on.field('pods', field='status.containerStatuses')
+def monitor_pod_health(name, namespace, status, **_):
+    resilience.handle_oom(name, namespace, status)
